@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+require "yaml_master"
+require "slop"
+
+opts = Slop.parse do |o|
+  o.string '-m', '--master', 'master yaml file'
+  o.string '-k', '--key', 'target yaml key (in data: block)'
+  o.string '-o', '--output', 'output filename'
+  o.bool '-a', '--all', 'target all key (defined in yaml_master: block)'
+  o.bool '-h', '--help', 'display this help'
+  o.on '--version', 'print the version' do
+    puts YamlMaster::VERSION
+    exit
+  end
+end
+
+options = opts.to_hash
+
+if options[:help]
+  puts opts
+  exit
+end
+
+unless options[:master]
+  raise "--master options is necessary"
+end
+
+yaml_master = YamlMaster.new(options[:master])
+
+if options[:all]
+  yaml_master.generate_all
+else
+  yaml_master.generate(options[:key], options[:output])
+end
