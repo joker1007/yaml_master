@@ -1,0 +1,57 @@
+yaml_master:
+  database_yml: <%= ENV["CONFIG_DIR"] %>/database.yml
+
+database_config: &database_config
+  development: &database_development
+    adapter: mysql2
+    encoding: utf8
+    database: development
+    pool: 5
+    host: &database_development_host
+    username: &database_development_username root
+    password: &database_development_password
+    socket: /tmp/mysql.sock
+
+  test: &database_test
+    adapter: mysql2
+    encoding: utf8
+    database: test
+    host: &database_test_host
+    username: &database_test_username root
+    password: &database_test_password
+
+  production: &database_production
+    adapter: mysql2
+    encoding: utf8
+    database: production
+    pool: 5
+    host: &database_production_host "192.168.1.100"
+    username: &database_production_username root
+    password: &database_production_password
+    socket: /tmp/mysql.sock
+
+
+data:
+  database_yml:
+    <<: *database_config
+
+  embulk_yml:
+    in:
+      type: file
+      path_prefix: example.csv
+      parser:
+        type: csv
+        skip_header_lines: 1
+        columns:
+          - {name: key_name, type: string}
+          - {name: day, type: timestamp, format: '%Y-%m-%d'}
+          - {name: new_clients, type: long}
+
+    out:
+      type: mysql
+      host: *database_<%= ENV["RAILS_ENV"] %>_host
+      user: *database_<%= ENV["RAILS_ENV"] %>_username
+      password: *database_<%= ENV["RAILS_ENV"] %>_password
+      database: my_database
+      table: my_table
+      mode: insert
