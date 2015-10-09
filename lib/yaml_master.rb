@@ -4,6 +4,10 @@ require "yaml"
 require "erb"
 require "pathname"
 
+YAML.add_domain_type(nil, "include") do |type, val|
+  YAML.load_file(val)
+end
+
 class YamlMaster
   attr_reader :master, :master_path
 

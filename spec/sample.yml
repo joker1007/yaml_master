@@ -57,6 +57,7 @@ data:
       mode: insert
 
   embedded_methods:
+    included: !include spec/included.yml
     master_path: <%= master_path %>
     user_home: <%= user_home %>
     read_file_if_exist: "<%= read_file_if_exist(master_path.dirname + "sample.txt") %>"
