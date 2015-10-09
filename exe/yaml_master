@@ -3,13 +3,14 @@
 require "yaml_master"
 require "slop"
 
-opts = Slop.parse do |o|
-  o.string '-m', '--master', 'master yaml file'
-  o.string '-k', '--key', 'target yaml key (in data: block)'
-  o.string '-o', '--output', 'output filename'
-  o.bool '-a', '--all', 'target all key (defined in yaml_master: block)'
-  o.bool '-h', '--help', 'display this help'
-  o.on '--version', 'print the version' do
+opts = Slop.parse(strict: true) do
+  on 'm', 'master=', 'master yaml file'
+  on 'k', 'key=', 'single generate target key (in data: block)'
+  on 'o', 'output=', 'output filename'
+  on 'a', 'all', 'target all key (defined in yaml_master: block)'
+  on 'h', 'help', 'display this help'
+  on 'v', 'verbose', 'verbose mode'
+  on '--version', 'print the version' do
     puts YamlMaster::VERSION
     exit
   end
@@ -23,13 +24,27 @@ if options[:help]
 end
 
 unless options[:master]
-  raise "--master options is necessary"
+  puts "--master options is necessary"
+  puts opts
+  exit 1
+end
+
+if options[:all].nil? && options[:key].nil?
+  puts "--all or --key is necessary"
+  puts opts
+  exit 1
+end
+
+if !options[:key].nil? && options[:output].nil?
+  puts "single generation needs --output option"
+  puts opts
+  exit 1
 end
 
 yaml_master = YamlMaster.new(options[:master])
 
 if options[:all]
-  yaml_master.generate_all
+  yaml_master.generate_all(verbose: options[:verbose])
 else
-  yaml_master.generate(options[:key], options[:output])
+  yaml_master.generate(options[:key], options[:output], {verbose: options[:verbose]})
 end

@@ -23,15 +23,16 @@ class YamlMaster
     raise "data key is necessary on toplevel" unless @master["data"]
   end
 
-  def generate(key, output)
+  def generate(key, output, options = {})
+    puts "gen: #{output}" if options[:verbose]
     output_file = File.open(output, 'w')
     YAML.dump(@master["data"][key], output_file)
     output_file.close
   end
 
-  def generate_all
+  def generate_all(options = {})
     @master["yaml_master"].each do |key, output|
-      generate(key, output)
+      generate(key, output, options)
     end
   end
 
