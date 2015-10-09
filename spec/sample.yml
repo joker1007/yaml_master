@@ -1,5 +1,6 @@
 yaml_master:
   database_yml: <%= ENV["CONFIG_DIR"] %>/database.yml
+  embedded_methods: <%= ENV["CONFIG_DIR"] %>/embedded_methods.yml
 
 database_config: &database_config
   development: &database_development
@@ -30,7 +31,6 @@ database_config: &database_config
     password: &database_production_password
     socket: /tmp/mysql.sock
 
-
 data:
   database_yml:
     <<: *database_config
@@ -55,3 +55,9 @@ data:
       database: my_database
       table: my_table
       mode: insert
+
+  embedded_methods:
+    master_path: <%= master_path %>
+    user_home: <%= user_home %>
+    read_file_if_exist: "<%= read_file_if_exist(master_path.dirname + "sample.txt") %>"
+
