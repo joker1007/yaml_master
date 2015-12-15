@@ -1,4 +1,6 @@
 # YamlMaster
+[![Gem Version](https://badge.fury.io/rb/yaml_master.svg)](https://badge.fury.io/rb/yaml_master)
+[![Build Status](https://travis-ci.org/joker1007/yaml_master.svg)](https://travis-ci.org/joker1007/yaml_master)
 
 This gem is helper of yaml file generation from single master yaml file.
 
