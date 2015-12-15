@@ -29,15 +29,25 @@ class YamlMaster
 
   def generate(key, output, options = {})
     puts "gen: #{output}" if options[:verbose]
-    output_file = File.open(output, 'w')
-    YAML.dump(@master["data"][key], output_file)
-    output_file.close
+    yaml = YAML.dump(fetch_data_from_master(key))
+
+    return yaml unless output
+
+    File.open(output, 'w') do |f|
+      f.write(yaml)
+    end
   end
 
   def generate_all(options = {})
     @master["yaml_master"].each do |key, output|
       generate(key, output, options)
     end
+  end
+
+  private
+
+  def fetch_data_from_master(key)
+    @master["data"].fetch(key)
   end
 
   class EmbeddedMethods

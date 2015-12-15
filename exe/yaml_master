@@ -6,7 +6,7 @@ require "slop"
 opts = Slop.parse(strict: true) do
   on 'm', 'master=', 'master yaml file'
   on 'k', 'key=', 'single generate target key (in data: block)'
-  on 'o', 'output=', 'output filename'
+  on 'o', 'output=', 'output filename for single generate target'
   on 'a', 'all', 'target all key (defined in yaml_master: block)'
   on 'h', 'help', 'display this help'
   on 'v', 'verbose', 'verbose mode'
@@ -35,16 +35,11 @@ if options[:all].nil? && options[:key].nil?
   exit 1
 end
 
-if !options[:key].nil? && options[:output].nil?
-  puts "single generation needs --output option"
-  puts opts
-  exit 1
-end
-
 yaml_master = YamlMaster.new(options[:master])
 
 if options[:all]
   yaml_master.generate_all(verbose: options[:verbose])
 else
-  yaml_master.generate(options[:key], options[:output], {verbose: options[:verbose]})
+  result = yaml_master.generate(options[:key], options[:output], {verbose: options[:verbose]})
+  puts result unless options[:output]
 end
