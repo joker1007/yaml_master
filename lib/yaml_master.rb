@@ -3,12 +3,19 @@ require "yaml_master/version"
 require "yaml"
 require "erb"
 require "pathname"
+require "pp"
 
 YAML.add_domain_type(nil, "include") do |type, val|
   YAML.load_file(val)
 end
 
 class YamlMaster
+  class KeyFetchError < StandardError
+    def initialize(data, key)
+      super("cannot fetch key \"#{key}\" from\n#{data.pretty_inspect}")
+    end
+  end
+
   attr_reader :master, :master_path
 
   def initialize(io_or_filename)
@@ -27,7 +34,7 @@ class YamlMaster
     raise "data key is necessary on toplevel" unless @master["data"]
   end
 
-  def generate(key, output, options = {})
+  def generate(key, output = nil, options = {})
     puts "gen: #{output}" if options[:verbose]
     yaml = YAML.dump(fetch_data_from_master(key))
 
@@ -47,7 +54,24 @@ class YamlMaster
   private
 
   def fetch_data_from_master(key)
-    @master["data"].fetch(key)
+    keys = split_key(key)
+    keys.inject(@master["data"]) do |data, k|
+      data.fetch(k)
+    end
+  rescue
+    raise KeyFetchError.new(@master["data"], key)
+  end
+
+  def split_key(key)
+    keys = key.split(".")
+    array_pattern = /\[(\d+)\]/
+    keys.map do |k|
+      if k.match(array_pattern)
+        Regexp.last_match[1].to_i
+      else
+        k
+      end
+    end
   end
 
   class EmbeddedMethods

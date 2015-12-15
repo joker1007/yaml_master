@@ -41,4 +41,18 @@ RSpec.describe YamlMaster do
 
     FakeFS.deactivate!
   end
+
+  it "#generate (fetch nested data)" do
+    config = YAML.load(yaml_master.generate("embulk_yml.in.parser.columns.[1]"))
+    expect(config["name"]).to eq "day"
+    expect(config["type"]).to eq "timestamp"
+    expect(config["format"]).to eq "%Y-%m-%d"
+  end
+
+  it "#generate (nothing key)" do
+    expect { yaml_master.generate("no_data") }.to \
+      raise_error(YamlMaster::KeyFetchError)
+    expect { yaml_master.generate("embulk_yml.in.parser.columns.[3]") }.to \
+      raise_error(YamlMaster::KeyFetchError)
+  end
 end
