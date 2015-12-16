@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe YamlMaster do
-  let!(:yaml_master) { YamlMaster.new(File.expand_path("../sample.yml", __FILE__)) }
+  let!(:yaml_master) { YamlMaster.new(File.expand_path("../sample.yml", __FILE__), ["foo=bar"]) }
 
   after do
     FakeFS.deactivate!
@@ -23,6 +23,7 @@ RSpec.describe YamlMaster do
       yaml2 = YAML.load_file("./embedded_methods.yml")
       expect(yaml2["master_path"]).to eq File.expand_path("../sample.yml", __FILE__)
       expect(yaml2["user_home"]).to eq ENV["HOME"]
+      expect(yaml2["properties"]).to eq "bar"
       expect(yaml2["read_file_if_exist"]).to match /dummy/
       expect(yaml2["included"]["xyz"]).to eq "hoge"
     end

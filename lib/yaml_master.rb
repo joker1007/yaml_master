@@ -15,12 +15,14 @@ class YamlMaster
       super("cannot fetch key \"#{key}\" from\n#{data.pretty_inspect}")
     end
   end
+  class PropertyParseError < StandardError; end
 
-  attr_reader :master, :master_path
+  attr_reader :master, :master_path, :properties
 
-  def initialize(io_or_filename)
-    embedded_methods = EmbeddedMethods.new(self)
-    embedded_methods_binding = embedded_methods.instance_eval { binding }
+  def initialize(io_or_filename, property_strings = [])
+    parse_properties(property_strings)
+
+    embedded_methods_binding = EmbeddedMethods.new(self).get_binding
     data =
       if io_or_filename.is_a?(IO)
         ERB.new(io_or_filename.read).result(embedded_methods_binding)
@@ -74,6 +76,15 @@ class YamlMaster
     end
   end
 
+  def parse_properties(property_strings)
+    @properties = {}
+    property_strings.each_with_object(@properties) do |str, hash|
+      key, value = str.split("=")
+      raise PropertyParseError.new("#{str} is invalid format") unless key && value
+      hash[key] = value
+    end
+  end
+
   class EmbeddedMethods
     def initialize(yaml_master)
       @yaml_master = yaml_master
@@ -83,6 +94,10 @@ class YamlMaster
       Pathname(@yaml_master.master_path)
     end
 
+    def properties
+      @yaml_master.properties
+    end
+
     def user_home
       Pathname(ENV["HOME"])
     end
@@ -90,6 +105,10 @@ class YamlMaster
     def read_file_if_exist(path)
       return nil unless File.exist?(path)
       File.read(path)
+    end
+
+    def get_binding
+      binding
     end
   end
 end

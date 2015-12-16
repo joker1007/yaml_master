@@ -8,6 +8,7 @@ opts = Slop.parse(strict: true) do
   on 'k', 'key=', 'single generate target key (in data: block)'
   on 'o', 'output=', 'output filename for single generate target'
   on 'a', 'all', 'target all key (defined in yaml_master: block)'
+  on 'p', 'properties=', 'set property (--properties="NAME=VALUE,NAME=VALUE" or -p "NAME=VALUE" -p "NAME=VALUE")', as: Array
   on 'h', 'help', 'display this help'
   on 'v', 'verbose', 'verbose mode'
   on '--version', 'print the version' do
@@ -35,7 +36,7 @@ if options[:all].nil? && options[:key].nil?
   exit 1
 end
 
-yaml_master = YamlMaster.new(options[:master])
+yaml_master = YamlMaster.new(options[:master], options[:properties])
 
 if options[:all]
   yaml_master.generate_all(verbose: options[:verbose])
