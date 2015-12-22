@@ -22,7 +22,20 @@ Or install it yourself as:
 
 ## Usage
 
-Write master.yml
+### command help
+```
+Usage: yaml_master [options]
+    -m, --master          master yaml file
+    -k, --key             single generate target key (in data: block)
+    -o, --output          output filename for single generate target
+    -a, --all             target all key (defined in yaml_master: block)
+    -p, --properties      set property (--properties="NAME=VALUE,NAME=VALUE" or -p "NAME=VALUE" -p "NAME=VALUE")
+    -h, --help            display this help
+    -v, --verbose         verbose mode
+        --version         print the version
+```
+
+at first, Write master.yml
 
 ```yaml
 yaml_master:
@@ -85,8 +98,36 @@ data:
       mode: insert
 ```
 
-execute command.
+### single output
+```sh
+$ RAILS_ENV=production CONFIG_DIR="." yaml_master -m master.yml -k embulk_yml -o embulk_config.yml
+```
 
+```yaml
+# ./embulk_config.yml
+
+in:
+  type: file
+  path_prefix: example.csv
+  parser:
+    type: csv
+    skip_header_lines: 1
+    columns:
+      - {name: key_name, type: string}
+      - {name: day, type: timestamp, format: '%Y-%m-%d'}
+      - {name: new_clients, type: long}
+
+out:
+  type: mysql
+  host: *database_<%= ENV["RAILS_ENV"] %>_host
+  user: *database_<%= ENV["RAILS_ENV"] %>_username
+  password: *database_<%= ENV["RAILS_ENV"] %>_password
+  database: my_database
+  table: my_table
+  mode: insert
+```
+
+### all output
 ```sh
 $ RAILS_ENV=production CONFIG_DIR="." yaml_master -m master.yml --all
 ```
