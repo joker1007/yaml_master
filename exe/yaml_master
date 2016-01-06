@@ -36,7 +36,7 @@ if options[:all].nil? && options[:key].nil?
   exit 1
 end
 
-yaml_master = YamlMaster.new(options[:master], options[:properties])
+yaml_master = YamlMaster.new(options[:master], options[:properties] || [])
 
 if options[:all]
   yaml_master.generate_all(verbose: options[:verbose])
