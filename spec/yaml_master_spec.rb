@@ -65,4 +65,19 @@ RSpec.describe YamlMaster do
         raise_error(YamlMaster::KeyFetchError)
     end
   end
+
+  context "Hash style properties" do
+    let!(:yaml_master) { YamlMaster.new(File.expand_path("../sample.yml", __FILE__), {"foo" => "bar"}) }
+
+    it "#generate_all" do
+      FakeFS.activate!
+
+      yaml_master.generate_all
+
+      yaml2 = YAML.load_file("./embedded_methods.yml")
+      expect(yaml2["properties"]).to eq "bar"
+
+      FakeFS.deactivate!
+    end
+  end
 end

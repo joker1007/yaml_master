@@ -78,10 +78,14 @@ class YamlMaster
 
   def parse_properties(property_strings)
     @properties = {}
-    property_strings.each_with_object(@properties) do |str, hash|
-      key, value = str.split("=")
-      raise PropertyParseError.new("#{str} is invalid format") unless key && value
-      hash[key] = value
+    if property_strings.is_a?(Hash)
+      @properties = property_strings
+    else
+      property_strings.each_with_object(@properties) do |str, hash|
+        key, value = str.split("=")
+        raise PropertyParseError.new("#{str} is invalid format") unless key && value
+        hash[key] = value
+      end
     end
   end
 
