@@ -58,6 +58,8 @@ data:
 
   embedded_methods:
     included: !include spec/included.yml
+    included_erb: <%= include_yaml("included.yml") %>
+    included2: <%= include_yaml("included2.yml") %>
     master_path: <%= master_path %>
     user_home: <%= user_home %>
     properties: <%= properties["foo"] %>
