@@ -57,11 +57,14 @@ data:
       mode: insert
 
   embedded_methods:
-    included: !include spec/included.yml
-    included_erb: <%= include_yaml("included.yml") %>
-    included2: <%= include_yaml("included2.yml") %>
-    master_path: <%= master_path %>
-    user_home: <%= user_home %>
-    properties: <%= properties["foo"] %>
-    read_file_if_exist: "<%= read_file_if_exist(master_path.dirname + "sample.txt") %>"
+    included: !include included.yml
+    master_path: !master_path
+    master_path2: <%= master_path %>
+    user_home: !user_home
+    user_home2: <%= user_home %>
+    env: !env HOME
+    properties: !properties foo
+    included2: !include included2.yml
+    read_file_if_exist: !read_file_if_exist sample.txt
+    read_file_if_exist2: "<%= read_file_if_exist(master_path.dirname + "sample.txt") %>"
 

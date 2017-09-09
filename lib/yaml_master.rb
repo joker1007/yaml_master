@@ -3,11 +3,8 @@ require "yaml_master/version"
 require "yaml"
 require "erb"
 require "pathname"
-require "pp"
 
-YAML.add_domain_type(nil, "include") do |type, val|
-  YAML.load_file(val)
-end
+require "yaml_master/yaml_tree_builder"
 
 class YamlMaster
   class KeyFetchError < StandardError
@@ -18,9 +15,20 @@ class YamlMaster
   attr_reader :master, :master_path, :properties
 
   def initialize(io_or_filename, property_strings = [])
-    @context = Context.new(io_or_filename, PropertyParser.parse_properties(property_strings))
+    case io_or_filename
+    when String
+      @master_path = Pathname(io_or_filename).expand_path
+    when File
+      @master_path = Pathname(io_or_filename.absolute_path)
+    end
 
-    @master = YAML.load(@context.render_master)
+    @properties = PropertyParser.parse_properties(property_strings)
+    yaml = Context.new(master_path, @properties).render_master
+
+    parser = YAML::Parser.new(YamlMaster::YAMLTreeBuilder.new(@master_path, @properties))
+    tree = parser.parse(yaml).handler.root
+    @master = tree.to_ruby[0]
+
     raise "yaml_master key is necessary on toplevel" unless @master["yaml_master"]
     raise "data key is necessary on toplevel" unless @master["data"]
   end
@@ -84,13 +92,8 @@ class YamlMaster
   class Context
     attr_reader :master_path, :properties
 
-    def initialize(io_or_master_file, properties)
-      case io_or_master_file
-      when String
-        @master_path = Pathname(io_or_master_file)
-      when File
-        @master_path = Pathname(io_or_master_file.absolute_path)
-      end
+    def initialize(master_path, properties)
+      @master_path = master_path
       @properties = properties
     end
 
@@ -103,25 +106,8 @@ class YamlMaster
       File.read(path)
     end
 
-    def include_yaml(filename)
-      YAML.dump(
-        YAML.load(render_yaml(File.expand_path(filename, File.dirname(@master_path)))),
-        canonical: true
-      ).each_line.drop(1).join
-    end
-
     def render_master
-      render_yaml(@master_path)
-    end
-
-    private
-
-    def render_yaml(io_or_filename)
-      if io_or_filename.respond_to?(:read)
-        ERB.new(io_or_filename.read).result(binding)
-      else
-        ERB.new(File.read(io_or_filename)).result(binding)
-      end
+      ERB.new(File.read(@master_path)).result(binding)
     end
   end
 end

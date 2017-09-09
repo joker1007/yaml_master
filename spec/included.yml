@@ -1,1 +1,7 @@
 xyz: hoge
+db:
+  <<: *database_development
+abc:
+  - 1
+  - 2.3
+  - {a: 1, b: 2}
