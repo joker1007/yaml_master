@@ -66,5 +66,6 @@ data:
     properties: !properties foo
     included2: !include included2.yml
     read_file_if_exist: !read_file_if_exist sample.txt
+    read_file_if_exist: !read_file_if_exist nothing.txt
     read_file_if_exist2: "<%= read_file_if_exist(master_path.dirname + "sample.txt") %>"
 
