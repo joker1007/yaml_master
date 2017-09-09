@@ -28,6 +28,7 @@ RSpec.describe YamlMaster do
       expect(yaml2["env"]).to eq ENV["HOME"]
       expect(yaml2["properties"]).to eq "bar"
       expect(yaml2["read_file_if_exist"]).to match(/dummy/)
+      expect(yaml2["read_file_if_exist_nothing"]).to be_nil
       expect(yaml2["read_file_if_exist2"]).to match(/dummy/)
       expect(yaml2["included"]["xyz"]).to eq "hoge"
       expect(yaml2["included"]["abc"][0]).to eq 1

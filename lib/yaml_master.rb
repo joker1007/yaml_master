@@ -25,7 +25,8 @@ class YamlMaster
     @properties = PropertyParser.parse_properties(property_strings)
     yaml = Context.new(master_path, @properties).render_master
 
-    parser = YAML::Parser.new(YamlMaster::YAMLTreeBuilder.new(@master_path, @properties))
+    parser = YAML::Parser.new
+    parser.handler = YamlMaster::YAMLTreeBuilder.new(@master_path, @properties, parser)
     tree = parser.parse(yaml).handler.root
     @master = tree.to_ruby[0]
 
