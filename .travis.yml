@@ -1,6 +1,7 @@
 language: ruby
 sudo: false
 rvm:
-  - 2.2.3
-before_install: gem install bundler -v 1.10.5
+  - 2.3.4
+  - 2.4.1
+before_install: gem install bundler -v 1.15.4
 cache: bundler
