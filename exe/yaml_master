@@ -22,6 +22,10 @@ opt_parser = OptionParser.new do |opts|
     options[:all] = true
   end
 
+  opts.on("-d", "--dump", "dump evaluated master yaml") do ||
+    options[:dump] = true
+  end
+
   opts.on("-p", "--properties=PROPERTIES", %q{set property (--properties="NAME=VALUE,NAME=VALUE" or -p "NAME=VALUE" -p "NAME=VALUE")}) do |properties|
     options[:properties].concat(properties.split(/\s*,\s*/))
   end
@@ -49,8 +53,8 @@ unless options[:master]
   exit 1
 end
 
-if options[:all].nil? && options[:key].nil?
-  puts "--all or --key is necessary"
+if options[:all].nil? && options[:key].nil? && options[:dump].nil?
+  puts "--all or --key or --dump is necessary"
   puts opt_parser
   exit 1
 end
@@ -59,6 +63,9 @@ yaml_master = YamlMaster.new(options[:master], options[:properties])
 
 if options[:all]
   yaml_master.generate_all(verbose: options[:verbose])
+elsif options[:dump]
+  result = yaml_master.dump(options[:output], {verbose: options[:verbose]})
+  puts result unless options[:output]
 else
   result = yaml_master.generate(options[:key], options[:output], {verbose: options[:verbose]})
   puts result unless options[:output]

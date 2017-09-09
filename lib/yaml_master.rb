@@ -27,8 +27,8 @@ class YamlMaster
 
     parser = YAML::Parser.new
     parser.handler = YamlMaster::YAMLTreeBuilder.new(@master_path, @properties, parser)
-    tree = parser.parse(yaml).handler.root
-    @master = tree.to_ruby[0]
+    @tree = parser.parse(yaml).handler.root
+    @master = @tree.to_ruby[0]
 
     raise "yaml_master key is necessary on toplevel" unless @master["yaml_master"]
     raise "data key is necessary on toplevel" unless @master["data"]
@@ -36,19 +36,12 @@ class YamlMaster
 
   def generate(key, output = nil, options = {})
     yaml = YAML.dump(fetch_data_from_master(key))
+    write_to_output(yaml, output, options[:verbose])
+  end
 
-    if options[:verbose]
-      puts <<~VERBOSE
-        gen: #{output}
-        #{yaml}
-      VERBOSE
-    end
-
-    return yaml unless output
-
-    File.open(output, 'w') do |f|
-      f.write(yaml)
-    end
+  def dump(output = nil, options = {})
+    yaml = @tree.to_yaml
+    write_to_output(yaml, output, options[:verbose])
   end
 
   def generate_all(options = {})
@@ -77,6 +70,21 @@ class YamlMaster
       else
         k
       end
+    end
+  end
+
+  def write_to_output(yaml, output, verbose)
+    if output && verbose
+      puts <<~VERBOSE
+        gen: #{output}
+        #{yaml}
+      VERBOSE
+    end
+
+    return yaml unless output
+
+    File.open(output, 'w') do |f|
+      f.write(yaml)
     end
   end
 
