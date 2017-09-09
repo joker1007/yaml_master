@@ -34,8 +34,14 @@ class YamlMaster
   end
 
   def generate(key, output = nil, options = {})
-    puts "gen: #{output}" if options[:verbose]
     yaml = YAML.dump(fetch_data_from_master(key))
+
+    if options[:verbose]
+      puts <<~VERBOSE
+        gen: #{output}
+        #{yaml}
+      VERBOSE
+    end
 
     return yaml unless output
 
