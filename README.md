@@ -35,6 +35,17 @@ Usage: yaml_master [options]
         --version         print the version
 ```
 
+### Support YAML tags
+
+| tag                            | description                                                                                   |
+| ------------------------       | -------------------------------------------------------------------------------------         |
+| !include {yaml_filename}       | Replace value by other yaml file content. included file can use alias in master file.         |
+| !master_path                   | Replace value by master file path                                                             |
+| !user_home                     | Replace value by `ENV["HOME"]`.                                                               |
+| !env {key}                     | Replace value by `ENV["{key}"]`.                                                              |
+| !properties {key}              | Replace value by fetched value from given properties.                                         |
+| !read_file_if_exist {filename} | Replace value by content of {filename}. if {filename} does not exist, Replace value by `null` |
+
 at first, Write master.yml
 
 ```yaml
@@ -96,6 +107,15 @@ data:
       database: my_database
       table: my_table
       mode: insert
+
+tag_sample
+  included: !include included.yml
+  master_path: !master_path
+  user_home: !user_home
+  env: !env HOME
+  properties: !properties foo
+  read_file_if_exist: !read_file_if_exist sample.txt
+  read_file_if_exist_nothing: !read_file_if_exist nothing.txt
 ```
 
 ### single output
@@ -191,6 +211,46 @@ out:
   database: my_database
   table: my_table
   mode: insert
+```
+
+```yaml
+# ./tag_sample.yml
+
+---
+included:
+  xyz: hoge
+  db:
+    adapter: mysql2
+    encoding: utf8
+    database: development
+    pool: 5
+    host:
+    username: root
+    password:
+    socket: "/tmp/mysql.sock"
+  abc:
+  - 1
+  - 2.3
+  - a: 1
+    b: 2
+included2:
+- foo: bar
+- hoge: fuga
+- :abc:
+  - 1
+  - 2
+  - 3
+master_path: "/home/joker/.ghq/github.com/joker1007/yaml_master/spec/sample.yml"
+master_path2: "/home/joker/.ghq/github.com/joker1007/yaml_master/spec/sample.yml"
+user_home: "/home/joker"
+user_home2: "/home/joker"
+env: "/home/joker"
+properties: '24'
+read_file_if_exist: 'dummy
+
+'
+read_file_if_exist_nothing:
+read_file_if_exist2: 'dummy '
 ```
 
 ## How to use with Docker
