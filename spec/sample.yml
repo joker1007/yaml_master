@@ -64,7 +64,10 @@ data:
     user_home: !user_home
     user_home2: <%= user_home %>
     env: !env HOME
+    fullpath: !fullpath sample.txt
     properties: !properties foo
+    properties2: !properties foo2
+    fullpath: !fullpath sample.txt
     read_file_if_exist: !read_file_if_exist sample.txt
     read_file_if_exist_nothing: !read_file_if_exist nothing.txt
     read_file_if_exist2: "<%= read_file_if_exist(master_path.dirname + "sample.txt") %>"

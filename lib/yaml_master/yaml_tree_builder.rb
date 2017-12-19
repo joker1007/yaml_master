@@ -23,6 +23,12 @@ class YamlMaster::YAMLTreeBuilder < YAML::TreeBuilder
       s = build_scalar_node(@master_path.to_s)
       @last.children << s
       s
+    when "!fullpath"
+      path = Pathname(value)
+      path = path.absolute? ? path : @master_path.dirname.join(path)
+      s = build_scalar_node(path.to_s)
+      @last.children << s
+      s
     when "!user_home"
       s = build_scalar_node(ENV["HOME"])
       @last.children << s

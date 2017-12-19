@@ -27,6 +27,8 @@ RSpec.describe YamlMaster do
       expect(yaml2["user_home2"]).to eq ENV["HOME"]
       expect(yaml2["env"]).to eq ENV["HOME"]
       expect(yaml2["properties"]).to eq "bar"
+      expect(yaml2["properties2"]).to be_nil
+      expect(yaml2["fullpath"]).to eq File.expand_path("../sample.txt", __FILE__)
       expect(yaml2["read_file_if_exist"]).to match(/dummy/)
       expect(yaml2["read_file_if_exist_nothing"]).to be_nil
       expect(yaml2["read_file_if_exist2"]).to match(/dummy/)
@@ -74,7 +76,7 @@ RSpec.describe YamlMaster do
   end
 
   context "Hash style properties" do
-    let!(:yaml_master) { YamlMaster.new(File.expand_path("../sample.yml", __FILE__), {"foo" => "bar"}) }
+    let!(:yaml_master) { YamlMaster.new(File.expand_path("../sample.yml", __FILE__), {"foo" => "bar", "foo2" => [{"a" => 1}]}) }
 
     it "#generate_all" do
       FakeFS.activate!
@@ -83,6 +85,7 @@ RSpec.describe YamlMaster do
 
       yaml2 = YAML.load_file("./embedded_methods.yml")
       expect(yaml2["properties"]).to eq "bar"
+      expect(yaml2["properties2"]).to eq [{"a" => 1}]
 
       FakeFS.deactivate!
     end
