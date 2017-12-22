@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/joker1007/yaml_master.svg)](https://travis-ci.org/joker1007/yaml_master)
 
 This gem is helper of yaml file generation from single master yaml file.
+And this gem has some useful helpers. For example `!include`
 
 ## Installation
 
@@ -25,14 +26,15 @@ Or install it yourself as:
 ### command help
 ```
 Usage: yaml_master [options]
-    -m, --master          master yaml file
-    -k, --key             single generate target key (in data: block)
-    -o, --output          output filename for single generate target
-    -a, --all             target all key (defined in yaml_master: block)
-    -p, --properties      set property (--properties="NAME=VALUE,NAME=VALUE" or -p "NAME=VALUE" -p "NAME=VALUE")
-    -h, --help            display this help
-    -v, --verbose         verbose mode
-        --version         print the version
+    -m, --master=MASTER_FILE         master yaml file
+    -k, --key=KEY                    single generate target key (in data: block)
+    -o, --output=OUTPUT              output filename for single generate target
+    -a, --all                        target all key (defined in yaml_master: block)
+    -d, --dump                       dump evaluated master yaml
+    -p, --properties=PROPERTIES      set property (--properties="NAME=VALUE,NAME=VALUE" or -p "NAME=VALUE" -p "NAME=VALUE")
+    -v, --verbose                    verbose mode
+        --version                    Print version
+    -h, --help                       Prints this help
 ```
 
 ### Support YAML tags
@@ -108,7 +110,7 @@ data:
       table: my_table
       mode: insert
 
-tag_sample
+tag_sample:
   included: !include included.yml
   master_path: !master_path
   user_home: !user_home
@@ -217,6 +219,65 @@ out:
 # ./tag_sample.yml
 
 ---
+included:
+  xyz: hoge
+  db:
+    adapter: mysql2
+    encoding: utf8
+    database: development
+    pool: 5
+    host:
+    username: root
+    password:
+    socket: "/tmp/mysql.sock"
+  abc:
+  - 1
+  - 2.3
+  - a: 1
+    b: 2
+included2:
+- foo: bar
+- hoge: fuga
+- :abc:
+  - 1
+  - 2
+  - 3
+master_path: "/home/joker/.ghq/github.com/joker1007/yaml_master/spec/sample.yml"
+master_path2: "/home/joker/.ghq/github.com/joker1007/yaml_master/spec/sample.yml"
+user_home: "/home/joker"
+user_home2: "/home/joker"
+env: "/home/joker"
+properties: '24'
+read_file_if_exist: 'dummy
+
+'
+read_file_if_exist_nothing:
+read_file_if_exist2: 'dummy '
+```
+
+## Raw Dump
+
+Any yaml file can use yaml_master feature.
+
+```yaml
+# tag_sample.yml
+
+included: !include included.yml
+master_path: !master_path
+user_home: !user_home
+env: !env HOME
+properties: !properties foo
+read_file_if_exist: !read_file_if_exist sample.txt
+read_file_if_exist_nothing: !read_file_if_exist nothing.txt
+```
+
+```sh
+% yaml_master -m tag_sample.yml --dump
+```
+
+output
+
+```yaml
 included:
   xyz: hoge
   db:
