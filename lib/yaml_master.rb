@@ -29,14 +29,6 @@ class YamlMaster
     parser.handler = YamlMaster::YAMLTreeBuilder.new(@master_path, @properties, parser)
     @tree = parser.parse(yaml).handler.root
     @master = @tree.to_ruby[0]
-
-    raise "yaml_master key is necessary on toplevel" unless @master["yaml_master"]
-    raise "data key is necessary on toplevel" unless @master["data"]
-  end
-
-  def generate(key, output = nil, options = {})
-    yaml = YAML.dump(fetch_data_from_master(key))
-    write_to_output(yaml, output, options[:verbose])
   end
 
   def dump(output = nil, options = {})
@@ -44,7 +36,15 @@ class YamlMaster
     write_to_output(yaml, output, options[:verbose])
   end
 
+  def generate(key, output = nil, options = {})
+    raise "data key is necessary on toplevel" unless @master["data"]
+    yaml = YAML.dump(fetch_data_from_master(key))
+    write_to_output(yaml, output, options[:verbose])
+  end
+
   def generate_all(options = {})
+    raise "yaml_master key is necessary on toplevel" unless @master["yaml_master"]
+    raise "data key is necessary on toplevel" unless @master["data"]
     @master["yaml_master"].each do |key, output|
       generate(key, output, options)
     end
