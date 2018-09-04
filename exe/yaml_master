@@ -22,7 +22,7 @@ opt_parser = OptionParser.new do |opts|
     options[:all] = true
   end
 
-  opts.on("-d", "--dump", "dump evaluated master yaml") do ||
+  opts.on("-d", "--dump", "dump evaluated master yaml") do
     options[:dump] = true
   end
 
@@ -32,6 +32,22 @@ opt_parser = OptionParser.new do |opts|
 
   opts.on("-v", "--verbose", "verbose mode") do |verbose|
     options[:verbose] = true
+  end
+
+  opts.on("--[no-]header", %q{set whether generate yaml header or not}) do |h|
+    options[:header] = h
+  end
+
+  opts.on("--indentation=INDENT", Integer, %q{set yaml indentation level}) do |i|
+    options[:indentation] = i
+  end
+
+  opts.on("--[no-]canonical", %q{set whether canonical output or not}) do |c|
+    options[:canonical] = c
+  end
+
+  opts.on("--line-width=WIDTH", Integer, %q{set preferable line width}) do |w|
+    options[:line_width] = w
   end
 
   opts.on("--version", "Print version") do
@@ -62,11 +78,11 @@ end
 yaml_master = YamlMaster.new(options[:master], options[:properties])
 
 if options[:all]
-  yaml_master.generate_all(verbose: options[:verbose])
+  yaml_master.generate_all(**options)
 elsif options[:dump]
-  result = yaml_master.dump(options[:output], {verbose: options[:verbose]})
+  result = yaml_master.dump(options[:output], **options)
   puts result unless options[:output]
 else
-  result = yaml_master.generate(options[:key], options[:output], {verbose: options[:verbose]})
+  result = yaml_master.generate(options[:key], options[:output], **options)
   puts result unless options[:output]
 end

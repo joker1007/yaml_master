@@ -32,13 +32,25 @@ class YamlMaster
   end
 
   def dump(output = nil, options = {})
-    yaml = @tree.to_yaml
+    yaml_options = {
+      header: options[:header],
+      indentation: options[:indentation],
+      canonical: options[:canonical],
+      line_width: options[:line_width],
+    }.compact
+    yaml = @tree.to_yaml(nil, yaml_options)
     write_to_output(yaml, output, options[:verbose])
   end
 
   def generate(key, output = nil, options = {})
     raise "data key is necessary on toplevel" unless @master["data"]
-    yaml = YAML.dump(fetch_data_from_master(key))
+    yaml_options = {
+      header: options[:header],
+      indentation: options[:indentation],
+      canonical: options[:canonical],
+      line_width: options[:line_width],
+    }.compact
+    yaml = YAML.dump(fetch_data_from_master(key), yaml_options)
     write_to_output(yaml, output, options[:verbose])
   end
 
